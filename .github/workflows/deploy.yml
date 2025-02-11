@@ -14,8 +14,13 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Deploy to EC2 via SSH
+      env:
+        PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+        HOST: ${{ secrets.EC2_HOST }}
+        USER: ${{ secrets.EC2_USER }}
       run: |
-        ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+        echo "$PRIVATE_KEY" > github-ec2.pem && chmod 600 github-ec2.pem
+        ssh -o StrictHostKeyChecking=no -i github-ec2.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
           cd /home/ubuntu/ResumeRanker
           git pull origin main
           docker stop flask-container || true

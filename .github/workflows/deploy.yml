@@ -1,0 +1,25 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Deploy to EC2 via SSH
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+          cd /home/ubuntu/ResumeRanker
+          git pull origin main
+          docker stop flask-container || true
+          docker rm flask-container || true
+          docker build -t flask-app .
+          docker run -d -p 16832:5000 --name flask-container flask-app
+        EOF

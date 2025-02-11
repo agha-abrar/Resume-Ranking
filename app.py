@@ -89,4 +89,4 @@ def index():
     return render_template('dashboard.html', ranked_resumes=ranked_resumes)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
